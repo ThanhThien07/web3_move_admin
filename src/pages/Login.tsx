@@ -4,6 +4,7 @@ import { Settings, User as UserIcon, Lock, Loader2, Globe, ShieldCheck } from 'l
 import { useI18n } from '../i18n';
 import { toast } from 'sonner';
 import { loginAdmin } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -11,6 +12,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login: saveAuth } = useAuth();
   const { lang, setLang, t } = useI18n();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,6 +131,7 @@ export default function Login() {
             <div className="mt-12 pt-8 border-t border-slate-800/50 text-center space-y-5">
               <button
                 type="button"
+                onClick={() => navigate('/register')}
                 className="text-[10px] font-black text-slate-500 hover:text-emerald-400 transition-all flex items-center justify-center gap-3 mx-auto uppercase tracking-[0.2em]"
               >
                 <ShieldCheck className="w-4 h-4" />

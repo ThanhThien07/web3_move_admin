@@ -12,6 +12,7 @@ import {
   MessageSquare,
   AlertCircle
 } from 'lucide-react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
 import { SuiClientProvider, WalletProvider, createNetworkConfig, ConnectButton } from '@mysten/dapp-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -25,6 +26,7 @@ import Sales from './pages/Sales';
 import Messages from './pages/Messages';
 import Inventory from './pages/Inventory';
 import BookModal from './pages/BookModal';
+import Register from './pages/Register';
 
 const { networkConfig } = createNetworkConfig({
   devnet: { url: 'https://fullnode.devnet.sui.io:443' } as any,
@@ -104,7 +106,15 @@ function AdminApp() {
   );
 
   // 🚀 QUAN TRỌNG: Kiểm tra user trước khi render nội dung Admin
-  if (!user) return <Login />;
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
 
   const renderContent = () => {
     try {
@@ -304,7 +314,9 @@ export default function App() {
         <WalletProvider autoConnect>
           <I18nProvider>
             <AuthProvider>
-              <AdminApp />
+              <BrowserRouter>
+                <AdminApp />
+              </BrowserRouter>
             </AuthProvider>
           </I18nProvider>
         </WalletProvider>
