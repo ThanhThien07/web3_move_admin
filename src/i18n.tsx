@@ -35,6 +35,11 @@ const translations: Translations = {
   register: { en: 'Register', vi: 'Đăng ký' },
   username: { en: 'Username', vi: 'Tên đăng nhập' },
   password: { en: 'Password', vi: 'Mật khẩu' },
+  messages: { en: 'Messages', vi: 'Tin nhắn' },
+  chatWith: { en: 'Chat with', vi: 'Trò chuyện với' },
+  typeMessage: { en: 'Type a message...', vi: 'Nhập tin nhắn...' },
+  send: { en: 'Send', vi: 'Gửi' },
+  noChats: { en: 'No messages yet.', vi: 'Chưa có tin nhắn nào.' },
 };
 
 interface I18nContextType {

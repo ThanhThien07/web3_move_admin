@@ -1,43 +1,54 @@
 import { useState, useEffect } from 'react';
 import { 
-  Plus, 
-  Trash2, 
-  Edit3, 
   LayoutDashboard, 
   BookOpen, 
   DollarSign, 
-  Loader2,
   Search,
   Settings,
   LogOut,
   Bell,
   Menu,
   X,
-  Wallet,
-  Globe
+  MessageSquare
 } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
+import { SuiClientProvider, WalletProvider, createNetworkConfig, ConnectButton } from '@mysten/dapp-kit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import '@mysten/dapp-kit/dist/index.css';
 import { AuthProvider, useAuth } from './AuthContext';
 import { I18nProvider, useI18n } from './i18n';
-import { fetchBooks, addBook, updateBook, deleteBook, type Book } from './api';
+import { fetchBooks, deleteBook, type Book } from './api';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Sales from './pages/Sales';
+import Messages from './pages/Messages';
+import Inventory from './pages/Inventory';
+import BookModal from './pages/BookModal';
+
+const { networkConfig } = createNetworkConfig({
+  devnet: { url: 'https://fullnode.devnet.sui.io:443' } as any,
+  testnet: { url: 'https://fullnode.testnet.sui.io:443' } as any,
+  mainnet: { url: 'https://fullnode.mainnet.sui.io:443' } as any,
+});
+
+const queryClient = new QueryClient();
 
 function LanguageSwitcher() {
   const { lang, setLang } = useI18n();
   return (
-    <div className="flex items-center gap-2 bg-white border border-slate-100 p-1.5 rounded-xl shadow-sm">
-      <Globe className="w-4 h-4 text-slate-400 ml-1" />
+    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1 rounded-xl shadow-sm scale-90">
+      <Settings className="w-3.5 h-3.5 text-slate-400 ml-1" />
       <button 
+        type="button"
         onClick={() => setLang('en')}
-        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'en' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:bg-slate-50'}`}
+        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'en' ? 'bg-slate-900 text-white' : 'text-slate-400'}`}
       >
         EN
       </button>
       <button 
+        type="button"
         onClick={() => setLang('vi')}
-        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'vi' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:bg-slate-50'}`}
+        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'vi' ? 'bg-slate-900 text-white' : 'text-slate-400'}`}
       >
         VI
       </button>
@@ -46,21 +57,21 @@ function LanguageSwitcher() {
 }
 
 function AdminApp() {
-  const { user, logout, loading: authLoading } = useAuth();
-  const { t } = useI18n();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'sales'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'sales' | 'messages'>('dashboard');
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [search, setSearch] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const { t } = useI18n();
 
   useEffect(() => {
-    if (user) loadBooks();
-  }, [user]);
+    loadBooks();
+  }, []);
 
-  async function loadBooks() {
+  const loadBooks = async () => {
     setLoading(true);
     try {
       const data = await fetchBooks();
@@ -70,16 +81,13 @@ function AdminApp() {
     } finally {
       setLoading(false);
     }
-  }
-
-  if (authLoading) return null;
-  if (!user) return <Login />;
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this book?')) return;
     try {
       await deleteBook(id);
-      toast.success('Book removed from library');
+      toast.success('Book deleted successfully');
       loadBooks();
     } catch (err) {
       toast.error('Failed to delete book');
@@ -87,34 +95,28 @@ function AdminApp() {
   };
 
   const filteredBooks = books.filter(b => 
-    b.title.toLowerCase().includes(search.toLowerCase()) || 
+    b.title.toLowerCase().includes(search.toLowerCase()) ||
     b.author.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (!user) return <Login />;
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans selection:bg-brand-primary/20">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-brand-primary/10 selection:text-brand-primary">
       <Toaster position="top-right" richColors />
       
-      {/* Mobile Header */}
-      <header className="lg:hidden sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-white shadow-lg shadow-brand-primary/20">
-            <Settings className="w-5 h-5" />
-          </div>
-          <h1 className="font-black text-lg tracking-tight">Admin</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
-          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-500">
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-      </header>
+      {/* Mobile Sidebar Toggle */}
+      <button 
+        onClick={() => setIsSidebarOpen(true)}
+        className="lg:hidden fixed top-6 left-6 z-50 p-3 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 text-slate-600"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
 
-      {/* Sidebar Overlay (Mobile) */}
+      {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm lg:hidden animate-in fade-in duration-300"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] lg:hidden animate-in fade-in duration-300"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -156,10 +158,15 @@ function AdminApp() {
             icon={<DollarSign className="w-5 h-5" />}
             label={t('salesRecords')}
           />
+          <NavButton 
+            active={activeTab === 'messages'} 
+            onClick={() => { setActiveTab('messages'); setIsSidebarOpen(false); }}
+            icon={<MessageSquare className="w-5 h-5" />}
+            label={t('messages')}
+          />
         </nav>
         
         <div className="p-6 mt-auto space-y-4">
-          <LanguageSwitcher />
           <div className="rounded-3xl bg-slate-900 p-6 text-white relative overflow-hidden group">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
@@ -200,6 +207,9 @@ function AdminApp() {
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
+            <div className="scale-90 origin-right">
+              <ConnectButton className="!bg-brand-primary hover:!bg-brand-primary/80 !rounded-xl !px-4 !py-2 !text-xs !font-bold !transition-all !border-none !shadow-lg !shadow-brand-primary/20" />
+            </div>
             <button className="p-3 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-brand-primary hover:shadow-lg hover:shadow-brand-primary/5 transition-all">
               <Bell className="w-5 h-5" />
             </button>
@@ -217,99 +227,16 @@ function AdminApp() {
 
         <div className="px-8 pb-8">
           {activeTab === 'dashboard' && <Dashboard />}
-          
           {activeTab === 'sales' && <Sales />}
-
+          {activeTab === 'messages' && <Messages />}
           {activeTab === 'inventory' && (
-            <div className="space-y-8 animate-in fade-in duration-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">{t('manageBooks')}</h2>
-                  <p className="text-slate-500 font-medium">Add, update or remove digital products.</p>
-                </div>
-                <button 
-                  onClick={() => { setEditingBook(null); setIsModalOpen(true); }}
-                  className="btn-primary flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  {t('addBook')}
-                </button>
-              </div>
-
-              {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 gap-4">
-                  <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />
-                  <p className="font-bold text-slate-400 text-sm">Syncing with main library...</p>
-                </div>
-              ) : filteredBooks.length === 0 ? (
-                <div className="bg-white rounded-[2.5rem] border border-dashed border-slate-200 py-20 flex flex-col items-center justify-center text-center">
-                  <BookOpen className="w-16 h-16 text-slate-200 mb-4" />
-                  <h3 className="font-bold text-slate-800 text-lg">Inventory is empty</h3>
-                  <p className="text-slate-500 text-sm">Start building your library collection.</p>
-                </div>
-              ) : (
-                <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50/50 border-b border-slate-50">
-                          <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Product Details</th>
-                          <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden md:table-cell">Author</th>
-                          <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pricing</th>
-                          <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Control</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-50">
-                        {filteredBooks.map(book => (
-                          <tr key={book.id} className="group hover:bg-slate-50/40 transition-colors">
-                            <td className="px-8 py-5">
-                              <div className="flex items-center gap-5">
-                                <div className="h-16 w-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 shadow-sm ring-1 ring-slate-200/50 group-hover:scale-110 transition-transform duration-300">
-                                  {book.cover_url ? (
-                                    <img src={book.cover_url} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center"><BookOpen className="w-5 h-5 text-slate-300" /></div>
-                                  )}
-                                </div>
-                                <div className="flex flex-col min-w-0">
-                                  <span className="font-bold text-slate-900 group-hover:text-brand-primary transition-colors truncate">{book.title}</span>
-                                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">ID: {book.id.slice(0, 8)}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-8 py-5 hidden md:table-cell">
-                              <span className="text-sm font-bold text-slate-600">{book.author}</span>
-                            </td>
-                            <td className="px-8 py-5">
-                              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 w-fit border border-emerald-100/50">
-                                <DollarSign className="w-3 h-3" />
-                                <span className="text-sm font-black tracking-tight">{(parseInt(book.price_mist) / 10**9).toFixed(2)} SUI</span>
-                              </div>
-                            </td>
-                            <td className="px-8 py-5 text-right">
-                              <div className="flex items-center justify-end gap-3">
-                                <button 
-                                  onClick={() => { setEditingBook(book); setIsModalOpen(true); }}
-                                  className="p-3 text-slate-400 hover:text-brand-primary hover:bg-brand-primary/10 rounded-2xl transition-all"
-                                >
-                                  <Edit3 className="w-4 h-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleDelete(book.id)}
-                                  className="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
+            <Inventory 
+              books={filteredBooks} 
+              loading={loading}
+              onAdd={() => { setEditingBook(null); setIsModalOpen(true); }}
+              onEdit={book => { setEditingBook(book); setIsModalOpen(true); }}
+              onDelete={handleDelete}
+            />
           )}
         </div>
       </main>
@@ -343,160 +270,18 @@ function NavButton({ active, onClick, icon, label }: { active: boolean, onClick:
   );
 }
 
-function BookModal({ 
-  book, 
-  onClose, 
-  onSuccess 
-}: { 
-  book: Book | null; 
-  onClose: () => void; 
-  onSuccess: () => void;
-}) {
-  const { t } = useI18n();
-  const [formData, setFormData] = useState({
-    title: book?.title || '',
-    author: book?.author || '',
-    cover_url: book?.cover_url || '',
-    price_mist: book?.price_mist || '100000000',
-    access_url: book?.access_url || '',
-    owner_wallet: book?.owner_wallet || ''
-  });
-  const [saving, setSaving] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      if (book) {
-        await updateBook(book.id, formData);
-        toast.success('Inventory updated');
-      } else {
-        await addBook(formData);
-        toast.success('Book published to library');
-      }
-      onSuccess();
-    } catch (err) {
-      toast.error('Operation failed');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white rounded-[3rem] w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-400">
-        <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-          <div>
-            <h3 className="text-2xl font-black text-slate-900">{book ? t('editBook') : t('addBook')}</h3>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">SUI Blockchain Integration</p>
-          </div>
-          <button onClick={onClose} className="p-3 rounded-2xl hover:bg-white hover:shadow-lg transition-all text-slate-400 hover:text-slate-900">
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('title')}</label>
-              <input 
-                required
-                className="input-field" 
-                placeholder="e.g. Mastering Sui Move" 
-                value={formData.title}
-                onChange={e => setFormData({...formData, title: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('author')}</label>
-              <input 
-                required
-                className="input-field" 
-                placeholder="Name" 
-                value={formData.author}
-                onChange={e => setFormData({...formData, author: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('price')}</label>
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 flex items-center justify-center">
-                  <DollarSign className="w-full h-full" />
-                </div>
-                <input 
-                  required
-                  type="number"
-                  className="input-field pl-12" 
-                  placeholder="100000000" 
-                  value={formData.price_mist}
-                  onChange={e => setFormData({...formData, price_mist: e.target.value})}
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('ownerWallet')}</label>
-            <div className="relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 flex items-center justify-center">
-                <Wallet className="w-full h-full" />
-              </div>
-              <input 
-                required
-                className="input-field pl-12" 
-                placeholder="0x..." 
-                value={formData.owner_wallet}
-                onChange={e => setFormData({...formData, owner_wallet: e.target.value})}
-              />
-            </div>
-            <p className="mt-2 text-[10px] font-bold text-slate-400 italic">This wallet will receive payments from buyers.</p>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('coverUrl')}</label>
-            <input 
-              required
-              className="input-field" 
-              placeholder="https://images.unsplash.com/..." 
-              value={formData.cover_url}
-              onChange={e => setFormData({...formData, cover_url: e.target.value})}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('accessUrl')}</label>
-            <input 
-              required
-              className="input-field" 
-              placeholder="https://docs.sui.io" 
-              value={formData.access_url}
-              onChange={e => setFormData({...formData, access_url: e.target.value})}
-            />
-          </div>
-
-          <div className="pt-6 flex gap-4">
-            <button type="button" onClick={onClose} className="flex-1 py-4 px-6 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition-all">{t('cancel')}</button>
-            <button 
-              type="submit" 
-              disabled={saving}
-              className="flex-[2] btn-primary flex items-center justify-center gap-3 shadow-xl shadow-brand-primary/20"
-            >
-              {saving && <Loader2 className="w-5 h-5 animate-spin" />}
-              {book ? t('save') : t('publish')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
   return (
-    <I18nProvider>
-      <AuthProvider>
-        <AdminApp />
-      </AuthProvider>
-    </I18nProvider>
+    <QueryClientProvider client={queryClient}>
+      <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+        <WalletProvider autoConnect>
+          <I18nProvider>
+            <AuthProvider>
+              <AdminApp />
+            </AuthProvider>
+          </I18nProvider>
+        </WalletProvider>
+      </SuiClientProvider>
+    </QueryClientProvider>
   );
 }

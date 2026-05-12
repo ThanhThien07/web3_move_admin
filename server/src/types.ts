@@ -4,32 +4,38 @@ export interface BookItem {
   author: string;
   cover_url: string;
   price_mist: string;
-  access_url: string;
   owner_wallet: string;
 }
 
 export interface Purchase {
   id: string;
-  book_id: string;
-  username: string;
-  wallet_address: string;
+  bookId: string;
+  buyer: string;
   timestamp: string;
-  price_mist: string;
-  digest: string;
+  amount: string;
 }
 
-export interface AuditLog {
+export interface Message {
   id: string;
-  action: 'PUBLISH' | 'UNPUBLISH' | 'UPDATE';
-  book_title: string;
+  sender: string; // username or wallet
+  content: string;
   timestamp: string;
+  isAdmin: boolean;
+}
+
+export interface ChatSession {
+  id: string; // user ID
+  userId: string;
+  userName: string;
+  lastMessage: string;
+  timestamp: string;
+  messages: Message[];
 }
 
 export interface DatabaseSchema {
   books: BookItem[];
   purchases: Purchase[];
   users: any[];
-  admins?: any[];
-  favorites: any[];
-  audit_logs?: AuditLog[];
+  admins: any[];
+  chats: ChatSession[];
 }

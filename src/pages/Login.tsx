@@ -10,6 +10,7 @@ function LanguageSwitcher() {
   const { lang, setLang } = useI18n();
   return (
     <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1 rounded-xl shadow-sm scale-90">
+      <Globe className="w-3.5 h-3.5 text-slate-400 ml-1" />
       <button 
         type="button"
         onClick={() => setLang('en')}

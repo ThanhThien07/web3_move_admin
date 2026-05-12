@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as bookController from '../controllers/bookController';
 import * as authController from '../controllers/authController';
 import * as salesController from '../controllers/salesController';
+import * as chatController from '../controllers/chatController';
 
 const router = Router();
 
@@ -21,5 +22,10 @@ router.get('/logs', bookController.getAuditLogs);
 // Sales & Stats
 router.get('/sales', salesController.getSales);
 router.get('/stats', salesController.getStats);
+
+// Chat
+router.get('/chats', chatController.getChats);
+router.get('/chats/:userId', chatController.getChatByUser);
+router.post('/chats/send', chatController.sendMessage);
 
 export default router;

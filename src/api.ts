@@ -6,7 +6,6 @@ export interface Book {
   author: string;
   cover_url: string;
   price_mist: string;
-  access_url: string;
   owner_wallet: string;
 }
 
@@ -37,7 +36,7 @@ export interface Stats {
 export const fetchBooks = async (): Promise<Book[]> => {
   const res = await fetch(`${API_BASE_URL}/books`);
   const data = await res.json();
-  return data.items;
+  return data;
 };
 
 export const addBook = async (book: Omit<Book, 'id'>): Promise<Book> => {
