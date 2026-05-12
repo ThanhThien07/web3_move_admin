@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { Settings, Loader2, ShieldCheck, Lock, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { loginAdmin } from '../api';
 import Register from './Register';
 
 export default function Login() {
@@ -15,12 +16,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+      const data = await loginAdmin({ username, password });
       if (data.success) {
         login(data.user, data.token);
         toast.success('Welcome back, Admin!');

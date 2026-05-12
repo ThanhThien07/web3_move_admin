@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Settings, Loader2, UserPlus, Lock, ArrowLeft } from 'lucide-react';
+import { Loader2, UserPlus, Lock, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { registerAdmin } from '../api';
 
 interface RegisterProps {
   onBack: () => void;
@@ -21,12 +22,7 @@ export default function Register({ onBack }: RegisterProps) {
 
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+      const data = await registerAdmin({ username, password });
       if (data.success) {
         toast.success('Registration successful! Please sign in.');
         onBack();

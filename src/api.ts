@@ -77,3 +77,21 @@ export const fetchSales = async (): Promise<SalesRecord[]> => {
   const res = await fetch(`${API_BASE_URL}/sales`);
   return res.json();
 };
+
+export const registerAdmin = async (userData: any): Promise<any> => {
+  const res = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
+  return res.json();
+};
+
+export const loginAdmin = async (userData: any): Promise<any> => {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
+  return res.json();
+};
