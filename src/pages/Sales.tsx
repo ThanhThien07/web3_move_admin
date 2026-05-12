@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { 
-  ShoppingCart, 
-  Search, 
-  ExternalLink, 
-  User, 
-  Wallet, 
+import {
+  ShoppingCart,
+  Search,
+  ExternalLink,
+  User,
+  Wallet,
   Clock,
   Loader2,
 } from 'lucide-react';
@@ -31,7 +31,7 @@ export default function Sales() {
     }
   }
 
-  const filteredSales = sales.filter(s => 
+  const filteredSales = sales.filter(s =>
     s.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.book_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.wallet_address.toLowerCase().includes(searchTerm.toLowerCase())
@@ -44,12 +44,12 @@ export default function Sales() {
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">Sales History</h2>
           <p className="text-slate-500 font-medium">Monitor user purchases and blockchain verification.</p>
         </div>
-        
+
         <div className="relative w-full md:w-80">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search buyer or book..." 
+          <input
+            type="text"
+            placeholder="Search buyer or book..."
             className="input-field pl-12"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
@@ -73,8 +73,8 @@ export default function Sales() {
       ) : (
         <div className="grid gap-4">
           {filteredSales.map(sale => (
-            <div key={sale.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group flex flex-col md:flex-row md:items-center gap-6">
-              <div className="flex items-center gap-4 flex-grow min-w-0">
+            <div key={sale.id} className="bg-white p-6 rounded-4xl border border-slate-100 shadow-sm hover:shadow-md transition-all group flex flex-col md:flex-row md:items-center gap-6">
+              <div className="flex items-center gap-4 grow min-w-0">
                 <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                   <ShoppingCart className="w-6 h-6" />
                 </div>
@@ -87,7 +87,7 @@ export default function Sales() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12 flex-grow">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12 grow">
                 <div>
                   <div className="flex items-center gap-1.5 text-slate-400 mb-1">
                     <User className="w-3 h-3" />
@@ -116,11 +116,11 @@ export default function Sales() {
               <div className="flex items-center justify-between md:justify-end gap-6 pt-4 md:pt-0 border-t md:border-t-0 border-slate-50">
                 <div className="text-right">
                   <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Price</p>
-                  <p className="text-lg font-black text-brand-primary">{(Number(sale.price_mist) / 10**9).toFixed(2)} SUI</p>
+                  <p className="text-lg font-black text-brand-primary">{(Number(sale.price_mist) / 10 ** 9).toFixed(2)} SUI</p>
                 </div>
-                <a 
-                  href={`https://suiscan.xyz/testnet/tx/${sale.digest}`} 
-                  target="_blank" 
+                <a
+                  href={`https://suiscan.xyz/testnet/tx/${sale.digest}`}
+                  target="_blank"
                   rel="noreferrer"
                   className="p-3 rounded-xl bg-slate-50 text-slate-400 hover:text-brand-primary hover:bg-brand-primary/10 transition-all"
                 >

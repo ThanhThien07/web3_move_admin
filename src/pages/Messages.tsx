@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { 
-  Search, 
-  Send, 
-  User, 
-  MessageSquare, 
-  Loader2, 
+import {
+  Search,
+  Send,
+  User,
+  MessageSquare,
+  Loader2,
   CheckCheck,
   Circle
 } from 'lucide-react';
@@ -92,7 +92,7 @@ export default function Messages() {
           <h2 className="text-xl font-black text-slate-900 mb-4">{t('messages')}</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input 
+            <input
               type="text"
               placeholder={t('search')}
               className="w-full bg-white border border-slate-100 rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
@@ -100,7 +100,7 @@ export default function Messages() {
           </div>
         </div>
 
-        <div className="flex-grow overflow-y-auto">
+        <div className="grow overflow-y-auto">
           {loading ? (
             <div className="flex justify-center p-8"><Loader2 className="animate-spin w-6 h-6 text-brand-primary" /></div>
           ) : sessions.length === 0 ? (
@@ -110,9 +110,8 @@ export default function Messages() {
               <button
                 key={session.id}
                 onClick={() => setSelectedSession(session)}
-                className={`w-full p-6 flex items-center gap-4 transition-all hover:bg-white border-b border-slate-50/50 ${
-                  selectedSession?.id === session.id ? 'bg-white shadow-inner border-l-4 border-l-brand-primary' : ''
-                }`}
+                className={`w-full p-6 flex items-center gap-4 transition-all hover:bg-white border-b border-slate-50/50 ${selectedSession?.id === session.id ? 'bg-white shadow-inner border-l-4 border-l-brand-primary' : ''
+                  }`}
               >
                 <div className="relative">
                   <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
@@ -120,7 +119,7 @@ export default function Messages() {
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>
                 </div>
-                <div className="flex-grow text-left">
+                <div className="grow text-left">
                   <div className="flex justify-between items-center mb-1">
                     <span className="font-black text-slate-900 text-sm">{session.customerName || t('customer')}</span>
                     <span className="text-[10px] text-slate-400 font-bold">12:45</span>
@@ -136,7 +135,7 @@ export default function Messages() {
       </div>
 
       {/* Main Chat Window */}
-      <div className="flex-grow flex flex-col bg-white">
+      <div className="grow flex flex-col bg-white">
         {selectedSession ? (
           <>
             {/* Chat Header */}
@@ -157,17 +156,17 @@ export default function Messages() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-grow overflow-y-auto p-8 space-y-6 bg-slate-50/20">
+            <div className="grow overflow-y-auto p-8 space-y-6 bg-slate-50/20">
               {messages.map((msg, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className={`flex ${msg.isAdmin ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}
                 >
                   <div className={`max-w-[70%] ${msg.isAdmin ? 'order-1' : 'order-2'}`}>
                     <div className={`
                       p-4 rounded-3xl text-sm font-medium shadow-sm leading-relaxed
-                      ${msg.isAdmin 
-                        ? 'bg-brand-primary text-white rounded-tr-none shadow-brand-primary/20' 
+                      ${msg.isAdmin
+                        ? 'bg-brand-primary text-white rounded-tr-none shadow-brand-primary/20'
                         : 'bg-white text-slate-700 rounded-tl-none border border-slate-100'}
                     `}>
                       {msg.content}
@@ -184,14 +183,14 @@ export default function Messages() {
             {/* Message Input */}
             <div className="p-6 bg-white border-t border-slate-50">
               <form onSubmit={handleSendMessage} className="flex gap-4">
-                <input 
+                <input
                   type="text"
                   placeholder={t('typeMessage')}
-                  className="flex-grow bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary/30 transition-all shadow-inner"
+                  className="grow bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary/30 transition-all shadow-inner"
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
                 />
-                <button 
+                <button
                   type="submit"
                   disabled={sending || !newMessage.trim()}
                   className="bg-brand-primary hover:bg-brand-primary/90 disabled:bg-slate-200 text-white w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-lg shadow-brand-primary/20 active:scale-95 shrink-0"
@@ -202,7 +201,7 @@ export default function Messages() {
             </div>
           </>
         ) : (
-          <div className="flex-grow flex flex-col items-center justify-center text-center p-12">
+          <div className="grow flex flex-col items-center justify-center text-center p-12">
             <div className="w-24 h-24 rounded-[2.5rem] bg-brand-primary/5 text-brand-primary flex items-center justify-center mb-8 rotate-3">
               <MessageSquare className="w-12 h-12" />
             </div>

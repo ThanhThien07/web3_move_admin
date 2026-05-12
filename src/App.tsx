@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  DollarSign, 
+import {
+  LayoutDashboard,
+  BookOpen,
+  DollarSign,
   Search,
   Settings,
   LogOut,
@@ -39,14 +39,14 @@ function LanguageSwitcher() {
   return (
     <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1 rounded-xl shadow-sm scale-90">
       <Settings className="w-3.5 h-3.5 text-slate-400 ml-1" />
-      <button 
+      <button
         type="button"
         onClick={() => setLang('en')}
         className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'en' ? 'bg-slate-900 text-white' : 'text-slate-400'}`}
       >
         EN
       </button>
-      <button 
+      <button
         type="button"
         onClick={() => setLang('vi')}
         className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'vi' ? 'bg-slate-900 text-white' : 'text-slate-400'}`}
@@ -98,7 +98,7 @@ function AdminApp() {
     }
   };
 
-  const filteredBooks = books.filter(b => 
+  const filteredBooks = books.filter(b =>
     b.title?.toLowerCase().includes(search.toLowerCase()) ||
     b.author?.toLowerCase().includes(search.toLowerCase())
   );
@@ -116,8 +116,8 @@ function AdminApp() {
           return <Messages />;
         case 'inventory':
           return (
-            <Inventory 
-              books={filteredBooks} 
+            <Inventory
+              books={filteredBooks}
               loading={loading}
               onAdd={() => { setEditingBook(null); setIsModalOpen(true); }}
               onEdit={book => { setEditingBook(book); setIsModalOpen(true); }}
@@ -141,9 +141,9 @@ function AdminApp() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-brand-primary/10 selection:text-brand-primary">
       <Toaster position="top-right" richColors />
-      
+
       {/* Mobile Sidebar Toggle */}
-      <button 
+      <button
         onClick={() => setIsSidebarOpen(true)}
         className="lg:hidden fixed top-6 left-6 z-50 p-3 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 text-slate-600"
       >
@@ -152,15 +152,15 @@ function AdminApp() {
 
       {/* Mobile Overlay */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] lg:hidden animate-in fade-in duration-300"
+        <div
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-60 lg:hidden animate-in fade-in duration-300"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-slate-100 z-[70] flex flex-col transition-transform duration-300
+        fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-slate-100 z-70 flex flex-col transition-transform duration-300
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-8 flex items-center gap-4 border-b border-slate-50">
@@ -175,34 +175,34 @@ function AdminApp() {
             <X className="w-5 h-5" />
           </button>
         </div>
-        
-        <nav className="p-6 flex-grow space-y-2">
-          <NavButton 
-            active={activeTab === 'dashboard'} 
+
+        <nav className="p-6 grow space-y-2">
+          <NavButton
+            active={activeTab === 'dashboard'}
             onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}
             icon={<LayoutDashboard className="w-5 h-5" />}
             label={t('overview') || 'Overview'}
           />
-          <NavButton 
-            active={activeTab === 'inventory'} 
+          <NavButton
+            active={activeTab === 'inventory'}
             onClick={() => { setActiveTab('inventory'); setIsSidebarOpen(false); }}
             icon={<BookOpen className="w-5 h-5" />}
             label={t('manageBooks') || 'Inventory'}
           />
-          <NavButton 
-            active={activeTab === 'sales'} 
+          <NavButton
+            active={activeTab === 'sales'}
             onClick={() => { setActiveTab('sales'); setIsSidebarOpen(false); }}
             icon={<DollarSign className="w-5 h-5" />}
             label={t('salesRecords') || 'Sales'}
           />
-          <NavButton 
-            active={activeTab === 'messages'} 
+          <NavButton
+            active={activeTab === 'messages'}
             onClick={() => { setActiveTab('messages'); setIsSidebarOpen(false); }}
             icon={<MessageSquare className="w-5 h-5" />}
             label={t('messages') || 'Messages'}
           />
         </nav>
-        
+
         <div className="p-6 mt-auto space-y-4">
           <div className="rounded-3xl bg-slate-900 p-6 text-white relative overflow-hidden group">
             <div className="relative z-10">
@@ -211,7 +211,7 @@ function AdminApp() {
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Main Sync Active</span>
               </div>
               <p className="text-sm font-bold leading-relaxed mb-4">Linked to production DB.</p>
-              <button 
+              <button
                 onClick={logout}
                 className="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center justify-center gap-2"
               >
@@ -227,25 +227,25 @@ function AdminApp() {
       {/* Main Content */}
       <main className="lg:pl-72 min-h-screen pb-20">
         <header className="sticky top-0 z-40 bg-[#f8fafc]/80 backdrop-blur-md px-8 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-4 flex-grow max-w-xl">
+          <div className="flex items-center gap-4 grow max-w-xl">
             <div className="relative w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder={t('search') || 'Search...'} 
+              <input
+                type="text"
+                placeholder={t('search') || 'Search...'}
                 className="input-field pl-12"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4 ml-6">
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
             <div className="scale-90 origin-right">
-              <ConnectButton className="!bg-brand-primary hover:!bg-brand-primary/80 !rounded-xl !px-4 !py-2 !text-xs !font-bold !transition-all !border-none !shadow-lg !shadow-brand-primary/20" />
+              <ConnectButton className="bg-brand-primary! hover:bg-brand-primary/80! rounded-xl! px-4! py-2! text-xs! font-bold! transition-all! border-none! shadow-lg! shadow-brand-primary/20!" />
             </div>
             <button className="p-3 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-brand-primary hover:shadow-lg hover:shadow-brand-primary/5 transition-all">
               <Bell className="w-5 h-5" />
@@ -269,10 +269,10 @@ function AdminApp() {
 
       {/* Modal */}
       {isModalOpen && (
-        <BookModal 
-          book={editingBook} 
-          onClose={() => setIsModalOpen(false)} 
-          onSuccess={() => { setIsModalOpen(false); loadBooks(); }} 
+        <BookModal
+          book={editingBook}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={() => { setIsModalOpen(false); loadBooks(); }}
         />
       )}
     </div>
@@ -281,12 +281,12 @@ function AdminApp() {
 
 function NavButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
   return (
-    <button 
+    <button
       onClick={onClick}
       className={`
         w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black text-sm transition-all duration-300
-        ${active 
-          ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/30 translate-x-2' 
+        ${active
+          ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/30 translate-x-2'
           : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}
       `}
     >
