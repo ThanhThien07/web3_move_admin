@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-interface User {
+export interface User {
   username: string;
-  role: string;
+  role?: string;
 }
 
 interface AuthContextType {
@@ -21,7 +21,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedUser = localStorage.getItem('admin_user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        localStorage.removeItem('admin_user');
+      }
     }
     setLoading(false);
   }, []);
@@ -30,17 +34,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(userData);
     localStorage.setItem('admin_user', JSON.stringify(userData));
     localStorage.setItem('admin_token', token);
+    // Force a small delay then reload to ensure clean state
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 500);
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('admin_user');
     localStorage.removeItem('admin_token');
+    window.location.href = '/login';
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
