@@ -5,11 +5,20 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const DEFAULT_DB_PATH = path.resolve('../../web3_move_backend/database.json');
+const DEFAULT_DB_PATH = path.resolve('./database.json');
 const DB_FILE = path.resolve(process.env.DB_FILE || DEFAULT_DB_PATH);
 
 let dbData: DatabaseSchema = {
-  books: [],
+  books: [
+    {
+      id: 'book-1',
+      title: 'Sui Move Guide (Admin)',
+      author: 'Admin',
+      cover_url: 'https://images.unsplash.com/photo-1555661530-68c8e98db4e6?auto=format&fit=crop&w=400&q=80',
+      price_mist: '100000000',
+      access_url: 'https://docs.sui.io/'
+    }
+  ],
   purchases: [],
   users: [],
   favorites: [],

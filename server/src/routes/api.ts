@@ -7,6 +7,7 @@ const router = Router();
 
 // Auth
 router.post('/auth/login', authController.login);
+router.post('/auth/register', authController.register);
 
 // Books
 router.get('/books', bookController.getBooks);

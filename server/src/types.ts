@@ -28,6 +28,7 @@ export interface DatabaseSchema {
   books: BookItem[];
   purchases: Purchase[];
   users: any[];
+  admins?: any[];
   favorites: any[];
   audit_logs?: AuditLog[];
 }
