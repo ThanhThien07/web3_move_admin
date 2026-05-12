@@ -9,6 +9,30 @@ export interface Book {
   access_url: string;
 }
 
+export interface SalesRecord {
+  id: string;
+  book_id: string;
+  username: string;
+  wallet_address: string;
+  timestamp: string;
+  price_mist: string;
+  digest: string;
+}
+
+export interface AuditLog {
+  id: string;
+  action: 'PUBLISH' | 'UNPUBLISH' | 'UPDATE';
+  book_title: string;
+  timestamp: string;
+}
+
+export interface Stats {
+  totalBooks: number;
+  totalPurchases: number;
+  totalRevenueMist: string;
+  recentActivity: AuditLog[];
+}
+
 export const fetchBooks = async (): Promise<Book[]> => {
   const res = await fetch(`${API_BASE_URL}/books`);
   const data = await res.json();
@@ -37,4 +61,19 @@ export const deleteBook = async (id: string): Promise<void> => {
   await fetch(`${API_BASE_URL}/books/${id}`, {
     method: 'DELETE',
   });
+};
+
+export const fetchStats = async (): Promise<Stats> => {
+  const res = await fetch(`${API_BASE_URL}/stats`);
+  return res.json();
+};
+
+export const fetchLogs = async (): Promise<AuditLog[]> => {
+  const res = await fetch(`${API_BASE_URL}/logs`);
+  return res.json();
+};
+
+export const fetchSales = async (): Promise<SalesRecord[]> => {
+  const res = await fetch(`${API_BASE_URL}/sales`);
+  return res.json();
 };
