@@ -11,7 +11,14 @@ const __dirname = path.dirname(__filename);
 const DB_PATH = path.join(__dirname, '../../web3_move_backend/database.json');
 
 const app = express();
-app.use(cors());
+
+// 🚀 CẤU HÌNH CORS LINH HOẠT: Cho phép cả localhost và tên miền sau này của bạn
+app.use(cors({
+  origin: '*', // Trong sản xuất, bạn nên thay '*' bằng tên miền Netlify của mình
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 const getDB = () => {
@@ -23,10 +30,17 @@ const getDB = () => {
       fs.writeFileSync(DB_PATH, JSON.stringify(initial, null, 2));
       return initial;
     }
-    return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    const data = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    // 🚀 TỰ ĐỘNG VÁ LỖI: Đảm bảo các trường quan trọng luôn tồn tại
+    if (!data.admins) data.admins = [{username:'hung12', password:'123456789'}];
+    if (!data.chat_sessions) data.chat_sessions = [];
+    if (!data.books) data.books = [];
+    if (!data.purchases) data.purchases = [];
+    if (!data.audit_logs) data.audit_logs = [];
+    return data;
   } catch (e) {
     console.error("Database Read Error:", e);
-    return { books: [], admins: [{username:'hung12', password:'123456789'}] };
+    return { books: [], admins: [{username:'hung12', password:'123456789'}], chat_sessions: [], audit_logs: [], purchases: [] };
   }
 };
 
@@ -118,7 +132,8 @@ app.post('/api/chat/messages', (req, res) => {
   res.json(msg);
 });
 
-const PORT = 3002;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
-  console.log(`🚀 ADMIN BACKEND ĐÃ ĐƯỢC FIX LỖI PATH TẠI: http://localhost:${PORT}`);
+  console.log(`🚀 Admin Server đang chạy cực mượt tại: http://localhost:${PORT}`);
+  console.log(`📂 Database đang kết nối tại: ${DB_PATH}`);
 });

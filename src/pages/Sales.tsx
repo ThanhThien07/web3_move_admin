@@ -8,9 +8,11 @@ import {
   Clock,
   Loader2,
 } from 'lucide-react';
-import { fetchSales, type SalesRecord } from '../api';
+import { fetchSales, type SalesRecord } from '../api.js';
+import { useI18n } from '../i18n.tsx';
 
 export default function Sales() {
+  const { t } = useI18n();
   const [sales, setSales] = useState<SalesRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,7 +25,7 @@ export default function Sales() {
     setLoading(true);
     try {
       const data = await fetchSales();
-      setSales(data.reverse()); // Newest first
+      setSales(Array.isArray(data) ? [...data].reverse() : []); // Newest first
     } catch (err) {
       console.error(err);
     } finally {
@@ -32,25 +34,25 @@ export default function Sales() {
   }
 
   const filteredSales = sales.filter(s =>
-    s.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.book_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.wallet_address.toLowerCase().includes(searchTerm.toLowerCase())
+    (s.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (s.book_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (s.wallet_address || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Sales History</h2>
-          <p className="text-slate-500 font-medium">Monitor user purchases and blockchain verification.</p>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">{t('salesRecords') || 'Lịch sử bán hàng'}</h2>
+          <p className="text-slate-500 font-medium">Theo dõi các giao dịch mua sách và xác thực blockchain.</p>
         </div>
 
         <div className="relative w-full md:w-80">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search buyer or book..."
-            className="input-field pl-12"
+            placeholder="Tìm người mua hoặc mã sách..."
+            className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-brand-primary/10 transition-all shadow-sm"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
@@ -60,15 +62,15 @@ export default function Sales() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="w-10 h-10 text-brand-primary animate-spin" />
-          <p className="font-bold text-slate-400 text-sm">Fetching on-chain data...</p>
+          <p className="font-bold text-slate-400 text-sm">Đang tải dữ liệu on-chain...</p>
         </div>
       ) : filteredSales.length === 0 ? (
         <div className="bg-white rounded-3xl border border-dashed border-slate-200 py-20 flex flex-col items-center justify-center text-center">
           <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4">
             <ShoppingCart className="w-8 h-8 text-slate-200" />
           </div>
-          <h3 className="font-bold text-slate-800 text-lg">No sales found</h3>
-          <p className="text-slate-500 text-sm max-w-xs">When users purchase books on the platform, their transaction history will appear here.</p>
+          <h3 className="font-bold text-slate-800 text-lg">Chưa có đơn hàng nào</h3>
+          <p className="text-slate-500 text-sm max-w-xs">Khi khách hàng mua sách trên nền tảng, lịch sử giao dịch sẽ xuất hiện tại đây.</p>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -80,10 +82,10 @@ export default function Sales() {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-black text-slate-900 truncate">Purchase #{sale.id.slice(-6).toUpperCase()}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] font-black text-emerald-600 uppercase tracking-widest border border-emerald-100">Verified</span>
+                    <span className="font-black text-slate-900 truncate">Đơn hàng #{sale.id.slice(-6).toUpperCase()}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] font-black text-emerald-600 uppercase tracking-widest border border-emerald-100">Đã xác thực</span>
                   </div>
-                  <p className="text-sm font-bold text-slate-400 truncate">Book ID: {sale.book_id}</p>
+                  <p className="text-sm font-bold text-slate-400 truncate">Mã sách: {sale.book_id}</p>
                 </div>
               </div>
 
@@ -91,7 +93,7 @@ export default function Sales() {
                 <div>
                   <div className="flex items-center gap-1.5 text-slate-400 mb-1">
                     <User className="w-3 h-3" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Buyer</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">Người mua</span>
                   </div>
                   <p className="text-sm font-bold text-slate-800">{sale.username}</p>
                 </div>
@@ -99,7 +101,7 @@ export default function Sales() {
                 <div className="hidden lg:block">
                   <div className="flex items-center gap-1.5 text-slate-400 mb-1">
                     <Wallet className="w-3 h-3" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Wallet</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">Ví SUI</span>
                   </div>
                   <p className="text-sm font-bold text-slate-500 truncate max-w-[120px]">{sale.wallet_address}</p>
                 </div>
@@ -107,7 +109,7 @@ export default function Sales() {
                 <div>
                   <div className="flex items-center gap-1.5 text-slate-400 mb-1">
                     <Clock className="w-3 h-3" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Date</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">Ngày mua</span>
                   </div>
                   <p className="text-sm font-bold text-slate-800">{new Date(sale.timestamp).toLocaleDateString()}</p>
                 </div>
@@ -115,8 +117,8 @@ export default function Sales() {
 
               <div className="flex items-center justify-between md:justify-end gap-6 pt-4 md:pt-0 border-t md:border-t-0 border-slate-50">
                 <div className="text-right">
-                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Price</p>
-                  <p className="text-lg font-black text-brand-primary">{(Number(sale.price_mist) / 10 ** 9).toFixed(2)} SUI</p>
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Giá bán</p>
+                  <p className="text-lg font-black text-brand-primary">{(Number(sale.price_mist || 0) / 10 ** 9).toFixed(2)} SUI</p>
                 </div>
                 <a
                   href={`https://suiscan.xyz/testnet/tx/${sale.digest}`}

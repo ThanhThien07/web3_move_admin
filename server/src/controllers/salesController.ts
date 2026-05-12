@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getDB } from '../config/db';
+import { getDB } from '../config/db.js';
 
 export const getSales = async (req: Request, res: Response): Promise<void> => {
   try {

@@ -44,7 +44,7 @@ export default function Dashboard() {
           icon={<DollarSign className="w-6 h-6" />}
           label={t('totalRevenue')}
           value={`${((parseInt(stats?.totalRevenueMist || '0')) / 10**9).toFixed(2)} SUI`}
-          trend={t('realTimeSync')}
+          trend={t('realTimeSync') || 'LIVE SYNC'}
           color="bg-emerald-500"
         />
         <StatCard 
@@ -66,13 +66,13 @@ export default function Dashboard() {
           </div>
           
           <div className="space-y-4">
-            {stats?.recentActivity.map((log, i) => (
+            {(stats?.recentActivity || []).map((log, i) => (
               <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
                 <div className="flex items-center gap-4">
                   <div className={`w-2 h-2 rounded-full ${log.action === 'PUBLISH' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
                   <div>
                     <p className="text-sm font-bold text-slate-800">{log.action}: {log.book_title}</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{new Date(log.timestamp).toLocaleString()}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{log.timestamp ? new Date(log.timestamp).toLocaleString() : '---'}</p>
                   </div>
                 </div>
               </div>

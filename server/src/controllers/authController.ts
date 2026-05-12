@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
-import { getDB, saveDB } from '../config/db';
+import { getDB, saveDB } from '../config/db.js';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;
   
   try {
     const db = getDB();
-    // Kiểm tra trong danh sách admins (hoặc users nếu bạn muốn gộp)
     const admin = db.admins?.find((a: any) => a.username === username && a.password === password);
 
     if (admin) {

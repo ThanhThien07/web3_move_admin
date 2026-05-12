@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { X, Wallet, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useI18n } from '../i18n';
-import { addBook, updateBook, type Book } from '../api';
+import { useI18n } from '../i18n.tsx';
+import { addBook, updateBook, type Book } from '../api.js';
 
 interface BookModalProps {
   book: Book | null;
@@ -27,14 +27,14 @@ export default function BookModal({ book, onClose, onSuccess }: BookModalProps) 
     try {
       if (book) {
         await updateBook(book.id, formData);
-        toast.success('Book updated successfully');
+        toast.success('Cập nhật sách thành công');
       } else {
         await addBook(formData);
-        toast.success('Book added successfully');
+        toast.success('Xuất bản sách thành công');
       }
       onSuccess();
     } catch (err) {
-      toast.error('Failed to save book');
+      toast.error('Lỗi khi lưu sách');
     } finally {
       setSaving(false);
     }
@@ -56,8 +56,8 @@ export default function BookModal({ book, onClose, onSuccess }: BookModalProps) 
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('title')}</label>
                 <input
                   required
-                  className="input-field"
-                  placeholder="The Web3 Revolution"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
+                  placeholder="Cuộc cách mạng Web3"
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
                 />
@@ -66,8 +66,8 @@ export default function BookModal({ book, onClose, onSuccess }: BookModalProps) 
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('author')}</label>
                 <input
                   required
-                  className="input-field"
-                  placeholder="Satoshi Nakamoto"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
+                  placeholder="Tác giả"
                   value={formData.author}
                   onChange={e => setFormData({ ...formData, author: e.target.value })}
                 />
@@ -82,7 +82,7 @@ export default function BookModal({ book, onClose, onSuccess }: BookModalProps) 
                 </div>
                 <input
                   required
-                  className="input-field pl-12 font-mono text-xs"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-12 text-xs font-mono focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
                   placeholder="0x..."
                   value={formData.owner_wallet}
                   onChange={e => setFormData({ ...formData, owner_wallet: e.target.value })}
@@ -96,7 +96,7 @@ export default function BookModal({ book, onClose, onSuccess }: BookModalProps) 
                 <input
                   required
                   type="number"
-                  className="input-field"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
                   placeholder="100000000"
                   value={formData.price_mist}
                   onChange={e => setFormData({ ...formData, price_mist: e.target.value })}
@@ -106,8 +106,8 @@ export default function BookModal({ book, onClose, onSuccess }: BookModalProps) 
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('coverUrl')}</label>
                 <input
                   required
-                  className="input-field"
-                  placeholder="https://example.com/cover.jpg"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 text-sm font-bold focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
+                  placeholder="https://images.unsplash.com/..."
                   value={formData.cover_url}
                   onChange={e => setFormData({ ...formData, cover_url: e.target.value })}
                 />
@@ -119,7 +119,7 @@ export default function BookModal({ book, onClose, onSuccess }: BookModalProps) 
               <button
                 type="submit"
                 disabled={saving}
-                className="flex-2 btn-primary py-4 px-6 rounded-2xl font-black flex items-center justify-center gap-2"
+                className="flex-2 bg-brand-primary hover:bg-brand-secondary text-white py-4 px-6 rounded-2xl font-black flex items-center justify-center gap-2 shadow-xl shadow-brand-primary/20 active:scale-95 transition-all"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : (book ? t('save') : t('publish'))}
               </button>

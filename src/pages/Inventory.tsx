@@ -82,7 +82,7 @@ export default function Inventory({ books, loading, onAdd, onEdit, onDelete }: I
                       <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-700 w-fit border border-emerald-100/50 shadow-sm shadow-emerald-100/20">
                         <DollarSign className="w-3.5 h-3.5" />
                         <span className="text-sm font-black tracking-tight">
-                          {(parseInt(book.price_mist) / 10**9).toFixed(2)} SUI
+                          {(parseInt(book.price_mist || '0') / 10**9).toFixed(2)} SUI
                         </span>
                       </div>
                     </td>

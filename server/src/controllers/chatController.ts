@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import { getDB, saveDB } from '../config/db';
+import { getDB, saveDB } from '../config/db.js';
 
 export const getChats = async (req: Request, res: Response): Promise<void> => {
   try {
     const db = getDB();
-    // Chuyển đổi cấu hình chat từ DB sang định dạng Frontend mong đợi
     const sessions = (db.chat_sessions || []).map((s: any) => ({
       id: s.id,
       customerName: s.customerName || 'Khách hàng',

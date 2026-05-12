@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { getDB, saveDB } from '../config/db';
-import { BookItem, AuditLog } from '../types';
+import { getDB, saveDB } from '../config/db.js';
+import { BookItem, AuditLog } from '../types.js';
 
 const logAction = (action: AuditLog['action'], bookTitle: string) => {
   const db = getDB();
@@ -52,7 +52,7 @@ export const updateBook = async (req: Request, res: Response): Promise<void> => 
     const { id } = req.params;
     const db = getDB();
     
-    const index = db.books.findIndex(b => b.id === id);
+    const index = db.books.findIndex((b: BookItem) => b.id === id);
     if (index === -1) {
       res.status(404).json({ error: 'Book not found' });
       return;
@@ -73,7 +73,7 @@ export const deleteBook = async (req: Request, res: Response): Promise<void> => 
     const { id } = req.params;
     const db = getDB();
     
-    const index = db.books.findIndex(b => b.id === id);
+    const index = db.books.findIndex((b: BookItem) => b.id === id);
     if (index === -1) {
       res.status(404).json({ error: 'Book not found' });
       return;

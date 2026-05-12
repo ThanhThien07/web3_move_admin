@@ -7,35 +7,48 @@ export interface BookItem {
   owner_wallet: string;
 }
 
-export interface Purchase {
+export interface PurchaseRecord {
   id: string;
-  bookId: string;
-  buyer: string;
+  book_id: string;
+  username: string;
+  wallet_address: string;
   timestamp: string;
-  amount: string;
+  price_mist: string;
+  digest: string;
 }
 
-export interface Message {
+export interface AuditLog {
   id: string;
-  sender: string; // username or wallet
-  content: string;
+  action: 'PUBLISH' | 'UNPUBLISH' | 'UPDATE';
+  book_title: string;
   timestamp: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  content: string;
   isAdmin: boolean;
+  timestamp: string;
 }
 
 export interface ChatSession {
-  id: string; // user ID
-  userId: string;
-  userName: string;
-  lastMessage: string;
+  id: string;
+  customerName: string;
+  messages: ChatMessage[];
   timestamp: string;
-  messages: Message[];
+}
+
+export interface AdminUser {
+  username: string;
+  password?: string;
 }
 
 export interface DatabaseSchema {
   books: BookItem[];
-  purchases: Purchase[];
+  purchases: PurchaseRecord[];
   users: any[];
-  admins: any[];
-  chats: ChatSession[];
+  admins?: AdminUser[];
+  audit_logs?: AuditLog[];
+  chat_sessions?: ChatSession[];
+  favorites?: string[];
 }
