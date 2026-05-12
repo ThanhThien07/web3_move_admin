@@ -9,7 +9,8 @@ import {
   Bell,
   Menu,
   X,
-  MessageSquare
+  MessageSquare,
+  AlertCircle
 } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import { SuiClientProvider, WalletProvider, createNetworkConfig, ConnectButton } from '@mysten/dapp-kit';
@@ -68,16 +69,19 @@ function AdminApp() {
   const { t } = useI18n();
 
   useEffect(() => {
-    loadBooks();
-  }, []);
+    if (user) {
+      loadBooks();
+    }
+  }, [user]);
 
   const loadBooks = async () => {
     setLoading(true);
     try {
       const data = await fetchBooks();
-      setBooks(data);
+      setBooks(data || []);
     } catch (err) {
-      toast.error('Failed to load books');
+      toast.error('Failed to load books. Is backend running?');
+      setBooks([]);
     } finally {
       setLoading(false);
     }
@@ -95,11 +99,44 @@ function AdminApp() {
   };
 
   const filteredBooks = books.filter(b => 
-    b.title.toLowerCase().includes(search.toLowerCase()) ||
-    b.author.toLowerCase().includes(search.toLowerCase())
+    b.title?.toLowerCase().includes(search.toLowerCase()) ||
+    b.author?.toLowerCase().includes(search.toLowerCase())
   );
 
   if (!user) return <Login />;
+
+  const renderContent = () => {
+    try {
+      switch (activeTab) {
+        case 'dashboard':
+          return <Dashboard />;
+        case 'sales':
+          return <Sales />;
+        case 'messages':
+          return <Messages />;
+        case 'inventory':
+          return (
+            <Inventory 
+              books={filteredBooks} 
+              loading={loading}
+              onAdd={() => { setEditingBook(null); setIsModalOpen(true); }}
+              onEdit={book => { setEditingBook(book); setIsModalOpen(true); }}
+              onDelete={handleDelete}
+            />
+          );
+        default:
+          return <Dashboard />;
+      }
+    } catch (err) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <AlertCircle className="w-12 h-12 text-rose-500 mb-4" />
+          <h3 className="text-xl font-black text-slate-800">Component Error</h3>
+          <p className="text-slate-500">Failed to render this page. Try refreshing.</p>
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-brand-primary/10 selection:text-brand-primary">
@@ -144,25 +181,25 @@ function AdminApp() {
             active={activeTab === 'dashboard'} 
             onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}
             icon={<LayoutDashboard className="w-5 h-5" />}
-            label={t('overview')}
+            label={t('overview') || 'Overview'}
           />
           <NavButton 
             active={activeTab === 'inventory'} 
             onClick={() => { setActiveTab('inventory'); setIsSidebarOpen(false); }}
             icon={<BookOpen className="w-5 h-5" />}
-            label={t('manageBooks')}
+            label={t('manageBooks') || 'Inventory'}
           />
           <NavButton 
             active={activeTab === 'sales'} 
             onClick={() => { setActiveTab('sales'); setIsSidebarOpen(false); }}
             icon={<DollarSign className="w-5 h-5" />}
-            label={t('salesRecords')}
+            label={t('salesRecords') || 'Sales'}
           />
           <NavButton 
             active={activeTab === 'messages'} 
             onClick={() => { setActiveTab('messages'); setIsSidebarOpen(false); }}
             icon={<MessageSquare className="w-5 h-5" />}
-            label={t('messages')}
+            label={t('messages') || 'Messages'}
           />
         </nav>
         
@@ -179,7 +216,7 @@ function AdminApp() {
                 className="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center justify-center gap-2"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                {t('signOut')}
+                {t('signOut') || 'Sign Out'}
               </button>
             </div>
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-brand-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
@@ -195,7 +232,7 @@ function AdminApp() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
                 type="text" 
-                placeholder={t('search')} 
+                placeholder={t('search') || 'Search...'} 
                 className="input-field pl-12"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -226,18 +263,7 @@ function AdminApp() {
         </header>
 
         <div className="px-8 pb-8">
-          {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'sales' && <Sales />}
-          {activeTab === 'messages' && <Messages />}
-          {activeTab === 'inventory' && (
-            <Inventory 
-              books={filteredBooks} 
-              loading={loading}
-              onAdd={() => { setEditingBook(null); setIsModalOpen(true); }}
-              onEdit={book => { setEditingBook(book); setIsModalOpen(true); }}
-              onDelete={handleDelete}
-            />
-          )}
+          {renderContent()}
         </div>
       </main>
 

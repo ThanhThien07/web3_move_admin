@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useAuth } from '../AuthContext';
-import { Settings, User, Lock, Loader2, Globe, ShieldCheck } from 'lucide-react';
+import { Settings, User as UserIcon, Lock, Loader2, Globe, ShieldCheck } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { toast } from 'sonner';
+import { loginAdmin } from '../api';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login: saveAuth } = useAuth();
   const { lang, setLang, t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,26 +18,18 @@ export default function Login() {
     
     setLoading(true);
     try {
-      // Small timeout to prevent infinite hanging
-      const loginPromise = login(username, password);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('TIMEOUT')), 10000)
-      );
-
-      const success = await Promise.race([loginPromise, timeoutPromise]);
+      const response = await loginAdmin({ username, password });
       
-      if (!success) {
-        toast.error(t('loginFailed') || 'Invalid credentials');
+      if (response.success && response.user) {
+        saveAuth(response.user, response.token);
+        toast.success(t('loginSuccess') || 'Logged in successfully');
+      } else {
+        toast.error(response.error || t('loginFailed') || 'Invalid credentials');
       }
     } catch (err: any) {
-      if (err.message === 'TIMEOUT') {
-        toast.error('Connection timed out. Is the backend server running?');
-      } else {
-        toast.error('Connection failed. Please check your backend server.');
-      }
+      toast.error('Connection failed. Please check your backend server.');
       console.error('Login error:', err);
     } finally {
-      // CRITICAL: Always reset loading state
       setLoading(false);
     }
   };
@@ -79,7 +72,7 @@ export default function Login() {
             </div>
 
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">{t('dashboard') || 'Dashboard'} Portal</h1>
+              <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">Dashboard Portal</h1>
               <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{t('signInDesc') || 'Sign in to manage your Web3 Library'}</p>
             </div>
 
@@ -88,7 +81,7 @@ export default function Login() {
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">{t('username') || 'Username'}</label>
                 <div className="relative group/input">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-emerald-500 transition-colors z-10">
-                    <User className="w-5 h-5" />
+                    <UserIcon className="w-5 h-5" />
                   </div>
                   <input 
                     required
