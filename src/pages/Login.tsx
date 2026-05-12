@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { Settings, User as UserIcon, Lock, Loader2, Globe, ShieldCheck } from 'lucide-react';
 import { useI18n } from '../i18n';
@@ -18,16 +18,17 @@ export default function Login() {
     
     setLoading(true);
     try {
+      // Đảm bảo truyền Object đúng cấu trúc
       const response = await loginAdmin({ username, password });
       
       if (response.success && response.user) {
         saveAuth(response.user, response.token);
-        toast.success(t('loginSuccess') || 'Logged in successfully');
+        toast.success(t('loginSuccess'));
       } else {
-        toast.error(response.error || t('loginFailed') || 'Invalid credentials');
+        toast.error(response.error || t('loginFailed'));
       }
     } catch (err: any) {
-      toast.error('Connection failed. Please check your backend server.');
+      toast.error('Lỗi kết nối server Backend Admin.');
       console.error('Login error:', err);
     } finally {
       setLoading(false);
@@ -38,7 +39,7 @@ export default function Login() {
     <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-6 font-sans">
       <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
         
-        {/* Language Switcher */}
+        {/* Bộ chuyển đổi ngôn ngữ */}
         <div className="flex justify-center mb-8">
           <div className="bg-slate-800/40 p-1 rounded-2xl border border-slate-700/50 backdrop-blur-xl flex gap-1 shadow-2xl">
             <button 
@@ -72,13 +73,13 @@ export default function Login() {
             </div>
 
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">Dashboard Portal</h1>
-              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{t('signInDesc') || 'Sign in to manage your Web3 Library'}</p>
+              <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">Admin Portal</h1>
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{t('signInDesc')}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">{t('username') || 'Username'}</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">{t('username')}</label>
                 <div className="relative group/input">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-emerald-500 transition-colors z-10">
                     <UserIcon className="w-5 h-5" />
@@ -86,6 +87,7 @@ export default function Login() {
                   <input 
                     required
                     type="text"
+                    autoComplete="username"
                     className="w-full bg-slate-800/30 border border-slate-700/50 rounded-[1.5rem] py-5 pl-16 pr-6 text-white placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 transition-all text-sm font-bold shadow-inner"
                     placeholder="admin"
                     value={username}
@@ -95,7 +97,7 @@ export default function Login() {
               </div>
 
               <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">{t('password') || 'Password'}</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">{t('password')}</label>
                 <div className="relative group/input">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-emerald-500 transition-colors z-10">
                     <Lock className="w-5 h-5" />
@@ -103,6 +105,7 @@ export default function Login() {
                   <input 
                     required
                     type="password"
+                    autoComplete="current-password"
                     className="w-full bg-slate-800/30 border border-slate-700/50 rounded-[1.5rem] py-5 pl-16 pr-6 text-white placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 transition-all text-sm font-bold shadow-inner"
                     placeholder="••••••••"
                     value={password}
@@ -118,7 +121,7 @@ export default function Login() {
               >
                 <div className="absolute inset-0 bg-white/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
                 <span className="relative z-10">
-                  {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (t('login') || 'LOG IN SYSTEM')}
+                  {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : t('login')}
                 </span>
               </button>
             </form>
@@ -126,11 +129,10 @@ export default function Login() {
             <div className="mt-12 pt-8 border-t border-slate-800/50 text-center space-y-5">
               <button 
                 type="button"
-                onClick={() => window.location.href = '/register'}
                 className="text-[10px] font-black text-slate-500 hover:text-emerald-400 transition-all flex items-center justify-center gap-3 mx-auto uppercase tracking-[0.2em]"
               >
                 <ShieldCheck className="w-4 h-4" />
-                {t('register') || 'Register Account'}
+                {t('register')}
               </button>
               <p className="text-[10px] font-bold italic text-slate-700 tracking-wider">"Power is nothing without control."</p>
             </div>
