@@ -36,13 +36,19 @@ const translations = {
     register: 'Register Account',
     signInDesc: 'Sign in to manage your Web3 Library',
     loginSuccess: 'Logged in successfully',
-    loginFailed: 'Invalid credentials'
+    loginFailed: 'Invalid credentials',
+    typeMessage: 'Type a message...',
+    selectConversation: 'Select a Conversation',
+    selectDesc: 'Choose a customer from the list to start consulting.',
+    noMessages: 'No messages yet.',
+    customer: 'Customer',
+    activeNow: 'Active Now'
   },
   vi: {
     overview: 'Tổng quan hệ thống',
     manageBooks: 'Quản lý kho sách',
     salesRecords: 'Lịch sử bán hàng',
-    messages: 'Tin nhắn hỗ trợ',
+    messages: 'Tin nhắn tư vấn',
     totalBooks: 'Tổng số sách',
     totalPurchases: 'Tổng đơn hàng',
     totalRevenue: 'Tổng doanh thu',
@@ -73,7 +79,13 @@ const translations = {
     register: 'Đăng ký tài khoản mới',
     signInDesc: 'Đăng nhập để quản lý Thư viện Web3 của bạn',
     loginSuccess: 'Đăng nhập thành công',
-    loginFailed: 'Sai tài khoản hoặc mật khẩu'
+    loginFailed: 'Sai tài khoản hoặc mật khẩu',
+    typeMessage: 'Nhập tin nhắn của bạn...',
+    selectConversation: 'Chọn một cuộc hội thoại',
+    selectDesc: 'Chọn một khách hàng từ danh sách để bắt đầu tư vấn.',
+    noMessages: 'Chưa có tin nhắn nào.',
+    customer: 'Khách hàng',
+    activeNow: 'Đang hoạt động'
   }
 };
 
