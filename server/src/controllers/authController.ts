@@ -1,46 +1,40 @@
 import { Request, Response } from 'express';
-import { getDB, saveDB } from '../config/db.js';
+import { getDB, saveDB } from '../config/db';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;
-  const db = getDB();
   
-  if (!db.admins) db.admins = [];
-  
-  const admin = db.admins.find(a => a.username === username && a.password === password);
+  try {
+    const db = getDB();
+    // Kiểm tra trong danh sách admins (hoặc users nếu bạn muốn gộp)
+    const admin = db.admins?.find((a: any) => a.username === username && a.password === password);
 
-  if (admin) {
-    res.json({
-      success: true,
-      user: {
-        username: admin.username,
-        role: 'ADMIN'
-      },
-      token: `mock-jwt-${admin.username}`
-    });
-  } else {
-    // Fallback for default admin if no admins exist yet
-    if (username === 'admin' && password === 'password123' && db.admins.length === 0) {
+    if (admin) {
       res.json({
         success: true,
-        user: { username: 'admin', role: 'ADMIN' },
-        token: 'mock-jwt-admin'
+        user: { username: admin.username, role: 'ADMIN' },
+        token: 'admin-session-' + Date.now()
       });
-      return;
+    } else {
+      res.status(401).json({ 
+        success: false, 
+        error: 'Sai tên đăng nhập hoặc mật khẩu' 
+      });
     }
-    res.status(401).json({ success: false, error: 'Invalid credentials' });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, error: 'Lỗi server nội bộ' });
   }
 };
 
 export const register = async (req: Request, res: Response): Promise<void> => {
+  const { username, password } = req.body;
   try {
-    const { username, password } = req.body;
     const db = getDB();
-    
     if (!db.admins) db.admins = [];
     
-    if (db.admins.find(a => a.username === username)) {
-      res.status(400).json({ success: false, error: 'Admin already exists' });
+    if (db.admins.find((a: any) => a.username === username)) {
+      res.status(400).json({ success: false, error: 'Tài khoản đã tồn tại' });
       return;
     }
 
@@ -48,11 +42,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     db.admins.push(newAdmin);
     await saveDB();
 
-    res.status(201).json({
-      success: true,
-      message: 'Admin registered successfully'
-    });
+    res.json({ success: true, message: 'Đăng ký thành công' });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to register admin' });
+    res.status(500).json({ success: false, error: 'Lỗi đăng ký' });
   }
 };

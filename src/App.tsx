@@ -80,7 +80,7 @@ function AdminApp() {
       const data = await fetchBooks();
       setBooks(data || []);
     } catch (err) {
-      toast.error('Failed to load books. Is backend running?');
+      toast.error('Không thể kết nối đến Backend Admin.');
       setBooks([]);
     } finally {
       setLoading(false);
@@ -88,13 +88,13 @@ function AdminApp() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this book?')) return;
+    if (!confirm('Bạn có chắc chắn muốn xóa cuốn sách này?')) return;
     try {
       await deleteBook(id);
-      toast.success('Book deleted successfully');
+      toast.success('Xóa sách thành công');
       loadBooks();
     } catch (err) {
-      toast.error('Failed to delete book');
+      toast.error('Xóa sách thất bại');
     }
   };
 
@@ -103,6 +103,7 @@ function AdminApp() {
     b.author?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // 🚀 QUAN TRỌNG: Kiểm tra user trước khi render nội dung Admin
   if (!user) return <Login />;
 
   const renderContent = () => {
@@ -131,8 +132,8 @@ function AdminApp() {
       return (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <AlertCircle className="w-12 h-12 text-rose-500 mb-4" />
-          <h3 className="text-xl font-black text-slate-800">Component Error</h3>
-          <p className="text-slate-500">Failed to render this page. Try refreshing.</p>
+          <h3 className="text-xl font-black text-slate-800">Lỗi hiển thị</h3>
+          <p className="text-slate-500">Vui lòng thử tải lại trang.</p>
         </div>
       );
     }
@@ -181,42 +182,42 @@ function AdminApp() {
             active={activeTab === 'dashboard'}
             onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}
             icon={<LayoutDashboard className="w-5 h-5" />}
-            label={t('overview') || 'Overview'}
+            label={t('overview') || 'Tổng quan'}
           />
           <NavButton
             active={activeTab === 'inventory'}
             onClick={() => { setActiveTab('inventory'); setIsSidebarOpen(false); }}
             icon={<BookOpen className="w-5 h-5" />}
-            label={t('manageBooks') || 'Inventory'}
+            label={t('manageBooks') || 'Kho sách'}
           />
           <NavButton
             active={activeTab === 'sales'}
             onClick={() => { setActiveTab('sales'); setIsSidebarOpen(false); }}
             icon={<DollarSign className="w-5 h-5" />}
-            label={t('salesRecords') || 'Sales'}
+            label={t('salesRecords') || 'Doanh thu'}
           />
           <NavButton
             active={activeTab === 'messages'}
             onClick={() => { setActiveTab('messages'); setIsSidebarOpen(false); }}
             icon={<MessageSquare className="w-5 h-5" />}
-            label={t('messages') || 'Messages'}
+            label={t('messages') || 'Tin nhắn'}
           />
         </nav>
 
         <div className="p-6 mt-auto space-y-4">
-          <div className="rounded-3xl bg-slate-900 p-6 text-white relative overflow-hidden group">
+          <div className="rounded-3xl bg-slate-900 p-6 text-white relative overflow-hidden group border border-slate-800">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Main Sync Active</span>
               </div>
-              <p className="text-sm font-bold leading-relaxed mb-4">Linked to production DB.</p>
+              <p className="text-sm font-bold leading-relaxed mb-4">Kết nối cơ sở dữ liệu chính.</p>
               <button
                 onClick={logout}
                 className="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center justify-center gap-2"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                {t('signOut') || 'Sign Out'}
+                {t('signOut') || 'Đăng xuất'}
               </button>
             </div>
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-brand-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
@@ -226,14 +227,14 @@ function AdminApp() {
 
       {/* Main Content */}
       <main className="lg:pl-72 min-h-screen pb-20">
-        <header className="sticky top-0 z-40 bg-[#f8fafc]/80 backdrop-blur-md px-8 py-6 flex items-center justify-between">
+        <header className="sticky top-0 z-40 bg-[#f8fafc]/80 backdrop-blur-md px-8 py-6 flex items-center justify-between border-b border-slate-100">
           <div className="flex items-center gap-4 grow max-w-xl">
-            <div className="relative w-full">
+            <div className="relative w-full text-slate-900">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder={t('search') || 'Search...'}
-                className="input-field pl-12"
+                placeholder={t('search') || 'Tìm kiếm...'}
+                className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-brand-primary/10 transition-all shadow-sm"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
@@ -245,24 +246,24 @@ function AdminApp() {
               <LanguageSwitcher />
             </div>
             <div className="scale-90 origin-right">
-              <ConnectButton className="bg-brand-primary! hover:bg-brand-primary/80! rounded-xl! px-4! py-2! text-xs! font-bold! transition-all! border-none! shadow-lg! shadow-brand-primary/20!" />
+              <ConnectButton />
             </div>
-            <button className="p-3 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-brand-primary hover:shadow-lg hover:shadow-brand-primary/5 transition-all">
+            <button className="p-3 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-brand-primary transition-all">
               <Bell className="w-5 h-5" />
             </button>
             <div className="hidden sm:flex items-center gap-3 pl-4 border-l border-slate-200">
-              <div className="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center font-black">
-                {user.username[0].toUpperCase()}
+              <div className="w-10 h-10 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center font-black">
+                {user?.username?.[0]?.toUpperCase() || 'A'}
               </div>
-              <div className="text-left">
-                <p className="text-sm font-black text-slate-900 leading-none">{user.username}</p>
+              <div className="text-left min-w-[80px]">
+                <p className="text-sm font-black text-slate-900 leading-none truncate">{user?.username}</p>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Administrator</p>
               </div>
             </div>
           </div>
         </header>
 
-        <div className="px-8 pb-8">
+        <div className="px-8 pb-8 mt-8">
           {renderContent()}
         </div>
       </main>

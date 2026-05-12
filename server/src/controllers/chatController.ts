@@ -1,62 +1,63 @@
 import { Request, Response } from 'express';
-import { getDB, saveDB } from '../db.js';
-import { ChatSession, Message } from '../types.js';
+import { getDB, saveDB } from '../config/db';
 
 export const getChats = async (req: Request, res: Response): Promise<void> => {
   try {
     const db = getDB();
-    res.json(db.chats || []);
-  } catch (err) {
+    // Chuyển đổi cấu hình chat từ DB sang định dạng Frontend mong đợi
+    const sessions = (db.chat_sessions || []).map((s: any) => ({
+      id: s.id,
+      customerName: s.customerName || 'Khách hàng',
+      lastMessage: s.messages?.[s.messages.length - 1]?.content || '',
+      timestamp: s.timestamp || new Date().toISOString()
+    }));
+    res.json(sessions);
+  } catch (error) {
     res.status(500).json({ error: 'Failed to fetch chats' });
   }
 };
 
 export const getChatByUser = async (req: Request, res: Response): Promise<void> => {
-  const { userId } = req.params;
   try {
+    const { sessionId } = req.params;
     const db = getDB();
-    const chat = (db.chats || []).find(c => c.userId === userId);
-    res.json(chat || { messages: [] });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch chat' });
+    const session = (db.chat_sessions || []).find((s: any) => s.id === sessionId);
+    res.json(session ? session.messages : []);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch messages' });
   }
 };
 
 export const sendMessage = async (req: Request, res: Response): Promise<void> => {
-  const { userId, userName, content, isAdmin } = req.body;
   try {
+    const { sessionId, content, isAdmin } = req.body;
     const db = getDB();
-    if (!db.chats) db.chats = [];
+    if (!db.chat_sessions) db.chat_sessions = [];
 
-    let session = db.chats.find(c => c.userId === userId);
-
-    if (!session) {
-      session = {
-        id: `chat-${userId}`,
-        userId,
-        userName: userName || userId,
-        lastMessage: content,
-        timestamp: new Date().toISOString(),
-        messages: []
-      };
-      db.chats.push(session);
-    }
-
-    const newMessage: Message = {
+    let session = db.chat_sessions.find((s: any) => s.id === sessionId);
+    
+    const newMessage = {
       id: `msg-${Date.now()}`,
-      sender: isAdmin ? 'Admin' : userName || userId,
       content,
-      timestamp: new Date().toISOString(),
-      isAdmin: !!isAdmin
+      isAdmin: isAdmin || false,
+      timestamp: new Date().toISOString()
     };
 
-    session.messages.push(newMessage);
-    session.lastMessage = content;
-    session.timestamp = new Date().toISOString();
+    if (session) {
+      session.messages.push(newMessage);
+    } else {
+      session = {
+        id: sessionId || `session-${Date.now()}`,
+        customerName: 'Khách hàng mới',
+        messages: [newMessage],
+        timestamp: new Date().toISOString()
+      };
+      db.chat_sessions.push(session);
+    }
 
-    saveDB(db);
-    res.json(session);
-  } catch (err) {
+    await saveDB();
+    res.json(newMessage);
+  } catch (error) {
     res.status(500).json({ error: 'Failed to send message' });
   }
 };

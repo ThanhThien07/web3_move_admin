@@ -23,9 +23,9 @@ router.get('/logs', bookController.getAuditLogs);
 router.get('/sales', salesController.getSales);
 router.get('/stats', salesController.getStats);
 
-// Chat
-router.get('/chats', chatController.getChats);
-router.get('/chats/:userId', chatController.getChatByUser);
-router.post('/chats/send', chatController.sendMessage);
+// Chat (Khớp với Frontend api.ts)
+router.get('/chat/sessions', chatController.getChats);
+router.get('/chat/messages/:sessionId', chatController.getChatByUser);
+router.post('/chat/messages', chatController.sendMessage);
 
 export default router;

@@ -84,13 +84,11 @@ export const fetchStats = async (): Promise<Stats> => {
   return res.json();
 };
 
-// Thêm hàm fetchSales cho trang Lịch sử bán hàng
 export const fetchSales = async (): Promise<SalesRecord[]> => {
   const res = await fetch(`${API_BASE_URL}/sales`);
   return res.json();
 };
 
-// Auth APIs
 export const loginAdmin = async (userData: any): Promise<any> => {
   const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
@@ -109,7 +107,6 @@ export const registerAdmin = async (userData: any): Promise<any> => {
   return res.json();
 };
 
-// Chat APIs
 export const fetchChatSessions = async (): Promise<ChatSession[]> => {
   const res = await fetch(`${API_BASE_URL}/chat/sessions`);
   return res.json();
