@@ -7,7 +7,6 @@ import {
   Wallet, 
   Clock,
   Loader2,
-  AlertCircle
 } from 'lucide-react';
 import { fetchSales, type SalesRecord } from '../api';
 

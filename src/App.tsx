@@ -9,7 +9,6 @@ import {
   Loader2,
   Search,
   Settings,
-  History,
   LogOut,
   Bell,
   Menu,
