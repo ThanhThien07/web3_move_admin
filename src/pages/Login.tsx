@@ -1,133 +1,146 @@
 import { useState } from 'react';
 import { useAuth } from '../AuthContext';
+import { Settings, User, Lock, Loader2, Globe, ShieldCheck } from 'lucide-react';
 import { useI18n } from '../i18n';
-import { Settings, Loader2, ShieldCheck, Lock, UserPlus, Globe } from 'lucide-react';
 import { toast } from 'sonner';
-import { loginAdmin } from '../api';
-import Register from './Register';
-
-function LanguageSwitcher() {
-  const { lang, setLang } = useI18n();
-  return (
-    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1 rounded-xl shadow-sm scale-90">
-      <Globe className="w-3.5 h-3.5 text-slate-400 ml-1" />
-      <button 
-        type="button"
-        onClick={() => setLang('en')}
-        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'en' ? 'bg-slate-900 text-white' : 'text-slate-400'}`}
-      >
-        EN
-      </button>
-      <button 
-        type="button"
-        onClick={() => setLang('vi')}
-        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'vi' ? 'bg-slate-900 text-white' : 'text-slate-400'}`}
-      >
-        VI
-      </button>
-    </div>
-  );
-}
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
   const { login } = useAuth();
-  const { t } = useI18n();
+  const { lang, setLang, t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+    
     setLoading(true);
     try {
-      const data = await loginAdmin({ username, password });
-      if (data.success) {
-        login(data.user, data.token);
-        toast.success(t('welcomeAdmin'));
-      } else {
-        toast.error(data.error || 'Invalid credentials');
+      // Small timeout to prevent infinite hanging
+      const loginPromise = login(username, password);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('TIMEOUT')), 10000)
+      );
+
+      const success = await Promise.race([loginPromise, timeoutPromise]);
+      
+      if (!success) {
+        toast.error(t('loginFailed') || 'Invalid credentials');
       }
-    } catch (err) {
-      toast.error('Connection failed. Please check backend.');
+    } catch (err: any) {
+      if (err.message === 'TIMEOUT') {
+        toast.error('Connection timed out. Is the backend server running?');
+      } else {
+        toast.error('Connection failed. Please check your backend server.');
+      }
+      console.error('Login error:', err);
     } finally {
+      // CRITICAL: Always reset loading state
       setLoading(false);
     }
   };
 
-  if (isRegistering) return <Register onBack={() => setIsRegistering(false)} />;
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] p-6 relative overflow-hidden">
-      <div className="absolute top-6 right-6 z-50">
-        <LanguageSwitcher />
-      </div>
-
-      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -mr-48 -mt-48"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-primary/5 rounded-full blur-3xl -ml-48 -mb-48"></div>
-
-      <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-500">
-        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-8 md:p-12 border border-slate-100">
-          <div className="flex flex-col items-center mb-10 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-brand-primary flex items-center justify-center text-white shadow-xl shadow-brand-primary/30 mb-6 rotate-3">
-              <Settings className="w-10 h-10 animate-spin-slow" />
-            </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t('dashboard')} Portal</h1>
-            <p className="text-slate-500 font-medium mt-2">Sign in to manage your Web3 Library</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{t('username')}</label>
-              <div className="relative">
-                <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input 
-                  type="text" 
-                  required
-                  placeholder="admin"
-                  className="input-field pl-12"
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">{t('password')}</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input 
-                  type="password" 
-                  required
-                  placeholder="••••••••"
-                  className="input-field pl-12"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="w-full btn-primary mt-4 flex items-center justify-center gap-3 py-4 text-lg"
-            >
-              {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : t('login')}
-            </button>
-          </form>
-
-          <div className="mt-8 pt-8 border-t border-slate-50 text-center space-y-4">
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-6 font-sans">
+      <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
+        
+        {/* Language Switcher */}
+        <div className="flex justify-center mb-8">
+          <div className="bg-slate-800/40 p-1 rounded-2xl border border-slate-700/50 backdrop-blur-xl flex gap-1 shadow-2xl">
             <button 
               type="button"
-              onClick={() => setIsRegistering(true)}
-              className="text-xs font-black text-slate-400 hover:text-brand-primary uppercase tracking-widest flex items-center justify-center gap-2 mx-auto transition-colors"
+              onClick={() => setLang('en')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black transition-all ${lang === 'en' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
             >
-              <UserPlus className="w-4 h-4" />
-              {t('register')} new account
+              <Globe className="w-3.5 h-3.5" /> ENGLISH
             </button>
-            <p className="text-xs text-slate-400 font-medium italic">
-              "Power is nothing without control."
-            </p>
+            <button 
+              type="button"
+              onClick={() => setLang('vi')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black transition-all ${lang === 'vi' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
+            >
+              <Globe className="w-3.5 h-3.5" /> TIẾNG VIỆT
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/90 backdrop-blur-3xl rounded-[3rem] border border-slate-800 p-10 shadow-2xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent pointer-events-none opacity-50"></div>
+          
+          <div className="relative z-10">
+            <div className="flex justify-center mb-10">
+              <div className="relative">
+                <div className="absolute inset-0 bg-emerald-500 blur-2xl opacity-20 animate-pulse"></div>
+                <div className="w-24 h-24 rounded-[2rem] bg-emerald-500 flex items-center justify-center text-white shadow-2xl shadow-emerald-500/40 rotate-6 group-hover:rotate-12 transition-all duration-700 relative">
+                  <Settings className="w-12 h-12 animate-spin-slow" />
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mb-10">
+              <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">{t('dashboard') || 'Dashboard'} Portal</h1>
+              <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{t('signInDesc') || 'Sign in to manage your Web3 Library'}</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">{t('username') || 'Username'}</label>
+                <div className="relative group/input">
+                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-emerald-500 transition-colors z-10">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <input 
+                    required
+                    type="text"
+                    className="w-full bg-slate-800/30 border border-slate-700/50 rounded-[1.5rem] py-5 pl-16 pr-6 text-white placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 transition-all text-sm font-bold shadow-inner"
+                    placeholder="admin"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2">{t('password') || 'Password'}</label>
+                <div className="relative group/input">
+                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-emerald-500 transition-colors z-10">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <input 
+                    required
+                    type="password"
+                    className="w-full bg-slate-800/30 border border-slate-700/50 rounded-[1.5rem] py-5 pl-16 pr-6 text-white placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 transition-all text-sm font-bold shadow-inner"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-5 rounded-[1.5rem] shadow-2xl shadow-emerald-500/20 active:scale-[0.97] transition-all flex items-center justify-center gap-3 mt-10 relative overflow-hidden group/btn"
+              >
+                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                <span className="relative z-10">
+                  {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (t('login') || 'LOG IN SYSTEM')}
+                </span>
+              </button>
+            </form>
+
+            <div className="mt-12 pt-8 border-t border-slate-800/50 text-center space-y-5">
+              <button 
+                type="button"
+                onClick={() => window.location.href = '/register'}
+                className="text-[10px] font-black text-slate-500 hover:text-emerald-400 transition-all flex items-center justify-center gap-3 mx-auto uppercase tracking-[0.2em]"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                {t('register') || 'Register Account'}
+              </button>
+              <p className="text-[10px] font-bold italic text-slate-700 tracking-wider">"Power is nothing without control."</p>
+            </div>
           </div>
         </div>
       </div>
