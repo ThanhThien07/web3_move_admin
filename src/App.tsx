@@ -12,17 +12,42 @@ import {
   LogOut,
   Bell,
   Menu,
-  X
+  X,
+  Wallet,
+  Globe
 } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import { AuthProvider, useAuth } from './AuthContext';
+import { I18nProvider, useI18n } from './i18n';
 import { fetchBooks, addBook, updateBook, deleteBook, type Book } from './api';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Sales from './pages/Sales';
 
+function LanguageSwitcher() {
+  const { lang, setLang } = useI18n();
+  return (
+    <div className="flex items-center gap-2 bg-white border border-slate-100 p-1.5 rounded-xl shadow-sm">
+      <Globe className="w-4 h-4 text-slate-400 ml-1" />
+      <button 
+        onClick={() => setLang('en')}
+        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'en' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:bg-slate-50'}`}
+      >
+        EN
+      </button>
+      <button 
+        onClick={() => setLang('vi')}
+        className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${lang === 'vi' ? 'bg-brand-primary text-white' : 'text-slate-400 hover:bg-slate-50'}`}
+      >
+        VI
+      </button>
+    </div>
+  );
+}
+
 function AdminApp() {
   const { user, logout, loading: authLoading } = useAuth();
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'sales'>('dashboard');
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,9 +103,12 @@ function AdminApp() {
           </div>
           <h1 className="font-black text-lg tracking-tight">Admin</h1>
         </div>
-        <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-500">
-          <Menu className="w-6 h-6" />
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-500">
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
       </header>
 
       {/* Sidebar Overlay (Mobile) */}
@@ -114,36 +142,37 @@ function AdminApp() {
             active={activeTab === 'dashboard'} 
             onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}
             icon={<LayoutDashboard className="w-5 h-5" />}
-            label="Overview"
+            label={t('overview')}
           />
           <NavButton 
             active={activeTab === 'inventory'} 
             onClick={() => { setActiveTab('inventory'); setIsSidebarOpen(false); }}
             icon={<BookOpen className="w-5 h-5" />}
-            label="Manage Books"
+            label={t('manageBooks')}
           />
           <NavButton 
             active={activeTab === 'sales'} 
             onClick={() => { setActiveTab('sales'); setIsSidebarOpen(false); }}
             icon={<DollarSign className="w-5 h-5" />}
-            label="Sales Records"
+            label={t('salesRecords')}
           />
         </nav>
         
-        <div className="p-6 mt-auto">
+        <div className="p-6 mt-auto space-y-4">
+          <LanguageSwitcher />
           <div className="rounded-3xl bg-slate-900 p-6 text-white relative overflow-hidden group">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Main Sync Active</span>
               </div>
-              <p className="text-sm font-bold leading-relaxed mb-4">Your library is linked with the production database.</p>
+              <p className="text-sm font-bold leading-relaxed mb-4">Linked to production DB.</p>
               <button 
                 onClick={logout}
                 className="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center justify-center gap-2"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                Sign Out
+                {t('signOut')}
               </button>
             </div>
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-brand-primary/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
@@ -159,7 +188,7 @@ function AdminApp() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
                 type="text" 
-                placeholder="Universal search..." 
+                placeholder={t('search')} 
                 className="input-field pl-12"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -168,6 +197,9 @@ function AdminApp() {
           </div>
           
           <div className="flex items-center gap-4 ml-6">
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
             <button className="p-3 rounded-xl bg-white border border-slate-100 text-slate-400 hover:text-brand-primary hover:shadow-lg hover:shadow-brand-primary/5 transition-all">
               <Bell className="w-5 h-5" />
             </button>
@@ -192,7 +224,7 @@ function AdminApp() {
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">Library Inventory</h2>
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">{t('manageBooks')}</h2>
                   <p className="text-slate-500 font-medium">Add, update or remove digital products.</p>
                 </div>
                 <button 
@@ -200,7 +232,7 @@ function AdminApp() {
                   className="btn-primary flex items-center gap-2"
                 >
                   <Plus className="w-5 h-5" />
-                  Add New Book
+                  {t('addBook')}
                 </button>
               </div>
 
@@ -305,8 +337,8 @@ function NavButton({ active, onClick, icon, label }: { active: boolean, onClick:
           : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}
       `}
     >
-      {icon}
-      {label}
+      <div className="shrink-0">{icon}</div>
+      <span>{label}</span>
     </button>
   );
 }
@@ -320,12 +352,14 @@ function BookModal({
   onClose: () => void; 
   onSuccess: () => void;
 }) {
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     title: book?.title || '',
     author: book?.author || '',
     cover_url: book?.cover_url || '',
     price_mist: book?.price_mist || '100000000',
-    access_url: book?.access_url || ''
+    access_url: book?.access_url || '',
+    owner_wallet: book?.owner_wallet || ''
   });
   const [saving, setSaving] = useState(false);
 
@@ -353,7 +387,7 @@ function BookModal({
       <div className="bg-white rounded-[3rem] w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-400">
         <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
           <div>
-            <h3 className="text-2xl font-black text-slate-900">{book ? 'Edit Inventory' : 'Publish New Content'}</h3>
+            <h3 className="text-2xl font-black text-slate-900">{book ? t('editBook') : t('addBook')}</h3>
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">SUI Blockchain Integration</p>
           </div>
           <button onClick={onClose} className="p-3 rounded-2xl hover:bg-white hover:shadow-lg transition-all text-slate-400 hover:text-slate-900">
@@ -361,10 +395,10 @@ function BookModal({
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-10 space-y-6">
+        <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Universal Title</label>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('title')}</label>
               <input 
                 required
                 className="input-field" 
@@ -374,7 +408,7 @@ function BookModal({
               />
             </div>
             <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Primary Author</label>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('author')}</label>
               <input 
                 required
                 className="input-field" 
@@ -384,13 +418,15 @@ function BookModal({
               />
             </div>
             <div>
-              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Price (MIST)</label>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('price')}</label>
               <div className="relative">
-                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 flex items-center justify-center">
+                  <DollarSign className="w-full h-full" />
+                </div>
                 <input 
                   required
                   type="number"
-                  className="input-field pl-10" 
+                  className="input-field pl-12" 
                   placeholder="100000000" 
                   value={formData.price_mist}
                   onChange={e => setFormData({...formData, price_mist: e.target.value})}
@@ -400,7 +436,24 @@ function BookModal({
           </div>
           
           <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Premium Cover Image URL</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('ownerWallet')}</label>
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 flex items-center justify-center">
+                <Wallet className="w-full h-full" />
+              </div>
+              <input 
+                required
+                className="input-field pl-12" 
+                placeholder="0x..." 
+                value={formData.owner_wallet}
+                onChange={e => setFormData({...formData, owner_wallet: e.target.value})}
+              />
+            </div>
+            <p className="mt-2 text-[10px] font-bold text-slate-400 italic">This wallet will receive payments from buyers.</p>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('coverUrl')}</label>
             <input 
               required
               className="input-field" 
@@ -411,7 +464,7 @@ function BookModal({
           </div>
           
           <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Digital Access URL (Protected)</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5 ml-1">{t('accessUrl')}</label>
             <input 
               required
               className="input-field" 
@@ -422,14 +475,14 @@ function BookModal({
           </div>
 
           <div className="pt-6 flex gap-4">
-            <button type="button" onClick={onClose} className="flex-1 py-4 px-6 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition-all">Discard</button>
+            <button type="button" onClick={onClose} className="flex-1 py-4 px-6 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition-all">{t('cancel')}</button>
             <button 
               type="submit" 
               disabled={saving}
               className="flex-[2] btn-primary flex items-center justify-center gap-3 shadow-xl shadow-brand-primary/20"
             >
               {saving && <Loader2 className="w-5 h-5 animate-spin" />}
-              {book ? 'Update Inventory' : 'Publish Book Now'}
+              {book ? t('save') : t('publish')}
             </button>
           </div>
         </form>
@@ -440,8 +493,10 @@ function BookModal({
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AdminApp />
-    </AuthProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <AdminApp />
+      </AuthProvider>
+    </I18nProvider>
   );
 }

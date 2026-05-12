@@ -5,6 +5,7 @@ export interface BookItem {
   cover_url: string;
   price_mist: string;
   access_url: string;
+  owner_wallet: string;
 }
 
 export interface Purchase {

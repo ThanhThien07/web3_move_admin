@@ -25,7 +25,7 @@ export const getBooks = async (req: Request, res: Response): Promise<void> => {
 
 export const addBook = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, author, cover_url, price_mist, access_url } = req.body;
+    const { title, author, cover_url, price_mist, access_url, owner_wallet } = req.body;
     const db = getDB();
     
     const newBook: BookItem = {
@@ -34,7 +34,8 @@ export const addBook = async (req: Request, res: Response): Promise<void> => {
       author,
       cover_url,
       price_mist,
-      access_url
+      access_url,
+      owner_wallet: owner_wallet || ''
     };
 
     db.books.push(newBook);
