@@ -179,8 +179,8 @@ function AdminApp() {
             <Settings className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="font-black text-2xl tracking-tight leading-none text-slate-900">Portal</h1>
-            <span className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mt-1 block">Library Master</span>
+            <h1 className="font-black text-2xl tracking-tight leading-none text-slate-900">Thanh Thien</h1>
+            <span className="text-[10px] font-black text-brand-primary uppercase tracking-[0.2em] mt-1 block">Library Admin</span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden ml-auto p-2 text-slate-400">
             <X className="w-5 h-5" />
