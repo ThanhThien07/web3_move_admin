@@ -75,7 +75,7 @@ export default function Login() {
             </div>
 
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">Admin Portal</h1>
+              <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase italic">Thanh Thien Admin</h1>
               <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{t('signInDesc')}</p>
             </div>
 
